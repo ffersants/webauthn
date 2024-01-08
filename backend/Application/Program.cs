@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddFido2Context<AppDbContext>();
-
+builder.Services.AddCors(p => p.AddPolicy("teste", p => p.AllowAnyMethod()
+                                                         .AllowAnyHeader()
+                                                         .AllowAnyOrigin()));
 //builder.Services.Configure<Fido2Configuration>(builder.Configuration.GetSection("fido2"));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDataProtection();
@@ -21,6 +23,8 @@ builder.Services.AddFido2(builder.Configuration.GetSection("Fido2"));
 
 var app = builder.Build();
 
+app.UseCors("teste");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -28,8 +32,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

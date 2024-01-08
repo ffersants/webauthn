@@ -29,7 +29,7 @@ namespace Application.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Get([FromBody] CreateRegisterOptionsInput input)
+        public async Task<ActionResult> Post([FromBody] CreateRegisterOptionsInput input)
         {
             try
             {
