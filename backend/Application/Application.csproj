@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'DevelopmentHomeNotebook' " />
 	<ItemGroup>
 		<PackageReference Include="NetDevPack.Fido2.EntityFramework.Store" Version="2.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
