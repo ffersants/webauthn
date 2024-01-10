@@ -8,6 +8,11 @@ using Application.DTOs.Input;
 using Data.Migrations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.AspNetCore.DataProtection;
+using Fido2NetLib.Development;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 
 namespace Application.Controllers
 {
@@ -78,6 +83,86 @@ namespace Application.Controllers
             }
         }
 
-        
+        [HttpPost]
+        public async Task<ActionResult> Index(PasswordlessModel model, string returnUrl)
+        {
+            var response = JsonSerializer.Deserialize<AuthenticatorAttestationRawResponse>(model.AttestationResponse);
+            // 1. get the options we sent the client
+            if (string.IsNullOrEmpty(_httpContext?.HttpContext?.Request.Cookies["fido2.attestationOptions"]))
+                return NotFound();
+
+            var jsonOptions = _protector.Unprotect(_httpContext?.HttpContext?.Request.Cookies["fido2.attestationOptions"]);
+            var options = CredentialCreateOptions.FromJson(jsonOptions);
+
+            // 2. Create callback so that lib can verify credential id is unique to this user
+            IsCredentialIdUniqueToUserAsyncDelegate callback = async (args, cancellationToken) =>
+            {
+                var users = await _fido2Store.ListCredentialsByPublicKeyIdAsync(args.CredentialId);
+                if (users.Count() > 0)
+                    return false;
+                return true;
+            };
+
+            // 2. Verify and make the credentials
+            var success = await _fido2.MakeNewCredentialAsync(response, options, callback);
+
+            _fido2Store.Store("", 
+                new Fido2User
+                {
+                    DisplayName = model.DisplayName,
+                    Name = model.Username,
+                    Id = Encoding.UTF8.GetBytes(model.Username) // byte representation of userID is required
+                }, 
+                new StoredCredential
+                {
+                    Descriptor = new PublicKeyCredentialDescriptor(success.Result.CredentialId),
+                    PublicKey = success.Result.PublicKey,
+                    UserHandle = success.Result.User.Id,
+                    SignatureCounter = success.Result.Counter,
+                    CredType = success.Result.CredType,
+                    RegDate = DateTime.Now,
+                    AaGuid = success.Result.Aaguid
+                });
+
+            // 4. Create user at ASP.NET Identity
+            var result = await _userManager.CreateAsync(user);
+
+            // 5. Default ASP.NET Identity flow. (e-mail confirmation, ReturnUrl, etc.)
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account without password.");
+
+                var userId = await _userManager.GetUserIdAsync(user);
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var callbackUrl = Url.Page(
+                    "/Account/ConfirmEmail",
+                    pageHandler: null,
+                    values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                    protocol: Request.Scheme);
+
+                await _emailSender.SendEmailAsync(model.Username, "Confirm your email",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                {
+                    return RedirectToPage("/Account/RegisterConfirmation", new { email = model.Username, returnUrl = returnUrl, area = "Identity" });
+                }
+                else
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return LocalRedirect(returnUrl);
+                }
+            }
+
+            // 6. In case of errors 
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+
+            return View(model);
+        }
     }
 }
