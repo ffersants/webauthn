@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddFido2Context<AppDbContext>();
 builder.Services.AddCors(p => p.AddPolicy("teste", p => p.AllowAnyMethod()
                                                          .AllowAnyHeader()
-                                                         .AllowAnyOrigin()));
+                                                         .WithOrigins("http://localhost:3000")
+                                                         .AllowCredentials()));
 //builder.Services.Configure<Fido2Configuration>(builder.Configuration.GetSection("fido2"));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDataProtection();

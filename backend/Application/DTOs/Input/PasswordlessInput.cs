@@ -1,12 +1,12 @@
-﻿using Fido2NetLib;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Fido2NetLib;
 
 namespace Application.DTOs.Input
 {
-    public class PasswordlessModel
+    public class PasswordlessInput
     {
-        /// <summary>
+          /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
@@ -19,7 +19,7 @@ namespace Application.DTOs.Input
         [Display(Name = "Name")]
         public string DisplayName { get; set; }
 
-        public string? AttestationResponse { get; set; }
+        public AuthenticatorAssertionRawResponse AttestationResponse { get; set; }
 
         public Fido2User Get()
         {
@@ -35,10 +35,9 @@ namespace Application.DTOs.Input
         {
             [Required]
             public string Username { get; set; }
-            [Required]
-            public bool RememberMe { get; set; }
 
             public string? AssertionResponse { get; set; }
         }
     }
+
 }
