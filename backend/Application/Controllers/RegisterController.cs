@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using Domain.Interfaces.Services;
 
 namespace Application.Controllers
 {
@@ -24,13 +25,18 @@ namespace Application.Controllers
         private readonly IFido2 _fido2;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IDataProtector _protector;
-
-        public RegisterController(IFido2 fido2, IFido2Store fido2Store, IHttpContextAccessor httpContext, IDataProtectionProvider protector)
+        private readonly IEmailService _emailService;
+        public RegisterController(IFido2 fido2, 
+                                  IFido2Store fido2Store, 
+                                  IHttpContextAccessor httpContext, 
+                                  IDataProtectionProvider protector,
+                                  IEmailService emailService)
         {
             _fido2Store = fido2Store;
             _fido2 = fido2;
             _httpContext = httpContext;
             _protector = protector.CreateProtector("dsof");
+            _emailService = emailService;
         }
 
         [HttpPost("get-options")]
@@ -79,7 +85,7 @@ namespace Application.Controllers
             }
             catch (Exception e)
             {
-                return Problem();
+                return Problem(e.Message);
             }
         }
 
@@ -125,6 +131,9 @@ namespace Application.Controllers
                         SignatureCounter = success.Result.Counter,
                         RegDate = DateTime.Now,
                     });
+
+                _emailService.EnviarEmailRegistroDispositivo(DateTime.Now, model.Username);
+
                 return Ok(success);
             }
             catch (Exception e)

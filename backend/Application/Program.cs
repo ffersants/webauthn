@@ -1,4 +1,6 @@
+using Application.Service;
 using Data.Context;
+using Domain.Interfaces.Services;
 using Fido2NetLib;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +23,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnectionString")));
 builder.Services.AddFido2(builder.Configuration.GetSection("Fido2"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
