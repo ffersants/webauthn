@@ -1,9 +1,12 @@
 using Application.Service;
 using Data.Context;
+using Data.Repository;
 using Domain.Interfaces.Services;
+using Domain.Repository;
 using Fido2NetLib;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddFido2(builder.Configuration.GetSection("Fido2"));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IDispositivosService, DispositivosService>();
+builder.Services.AddScoped<IDispositivoRepository, DispositivoRepository>();
 
 var app = builder.Build();
 
