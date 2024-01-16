@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import Register from "./components/register";
-import Login from "./components/login";
+import Register from "./appresentation/pages/register";
+import Login from "./appresentation/pages/login";
+import GerenciarDispositivos from "./appresentation/pages/gerenciar-dispositivos";
 
 const App = () => {
 	return (
 		<>
 			<Register/> 
 			<Login/>
+			<GerenciarDispositivos/>
 		</>
 	)
 };

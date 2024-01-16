@@ -1,9 +1,11 @@
 import { startRegistration } from "@simplewebauthn/browser";
 
 import { useState } from "react";
+import usuario from "../../domain/constants";
 const Register = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+	const baseUrl = process.env.REACT_APP_API_URL
     
 	const handleRegistration = async () => {
 		// Reset success/error messages
@@ -13,11 +15,11 @@ const Register = () => {
 		try {
 			// GET registration options from the endpoint that calls
 			const resp = await fetch(
-				"http://localhost:5139/api/register/get-options",
+				baseUrl + "/register/get-options",
 				{
 					body: JSON.stringify({
-						username: "user@example.com",
-						displayName: "string",
+						username: usuario.matricula,
+						displayName: usuario.email,
 						attestationResponse: "string",
 					}),
 					method: "POST",
@@ -32,10 +34,10 @@ const Register = () => {
 
 			// Pass the options to the authenticator and wait for a response
 			const attResp = await startRegistration(options);
-
+			
 			// POST the response to the endpoint that calls
 			const verificationResp = await fetch(
-				"http://localhost:5139/api/register/assert-options",
+				baseUrl + "/register/assert-options",
 				{
 					method: "POST",
 					headers: {
@@ -44,8 +46,8 @@ const Register = () => {
 					},
 					body: JSON.stringify({
 						AuthenticatorAttestationRawResponse: attResp,
-						username: "user@example.com",
-						displayName: "string",
+						username: usuario.matricula,
+						displayName: usuario.email,
 						userAgent: navigator.userAgent
 					}),
 					credentials: "include"

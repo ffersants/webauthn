@@ -1,5 +1,6 @@
 import { startAuthentication } from '@simplewebauthn/browser';
 import React from 'react';
+import usuario from '../../domain/constants';
 
 const Login = () => {
   const elemBegin = React.useRef(null);
@@ -9,16 +10,18 @@ const Login = () => {
   const handleClick = async () => {
     (elemSuccess as any).current.innerHTML = '';
     (elemError as any).current.innerHTML = '';
+    
+    const baseUrl = process.env.REACT_APP_API_URL
 
     try {
-      const resp = await fetch('http://localhost:5139/api/login/get-options?Username=user@example.com&displayName=string', {
+      const resp = await fetch(baseUrl + `/login/get-options?Username=${usuario.matricula}&displayName=${usuario.email}`, {
         credentials: "include"
       });
 
       const asseResp = await startAuthentication(await resp.json());
 			const cookie = document.cookie;
-
-      const verificationResp = await fetch('http://localhost:5139/api/login/assert-options', {
+     
+      const verificationResp = await fetch(baseUrl + '/login/assert-options', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,8 +29,8 @@ const Login = () => {
         },
         body: JSON.stringify({
           attestationResponse: asseResp,
-          username: "user@example.com",
-					displayName: "string",
+          username: usuario.email,
+					displayName: usuario.matricula,
         }),
         credentials: "include"
       });
