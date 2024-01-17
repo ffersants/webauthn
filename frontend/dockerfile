@@ -1,0 +1,26 @@
+# Use the ngrok base image
+FROM ngrok/ngrok:latest
+
+# Set the authentication token as an environment variable
+ENV NGROK_AUTHTOKEN=1otYQtxzOYCMvJFlwKzzhFaMbiV_6PdsR4SrrA3MzDnovSgpe
+
+# Switch to a non-root user
+USER root
+
+# Install Node.js (adjust the version as needed)
+RUN apt-get update && apt-get install -y nodejs npm
+
+# Create a volume based on the path
+VOLUME /Users/ditec134897/Documents/GitHub/webauthn/frontend
+
+# Set the working directory to the frontend folder
+WORKDIR /Users/ditec134897/Documents/GitHub/webauthn/frontend
+
+# Execute npm install
+RUN npm install
+
+# Expose the necessary port
+EXPOSE 3000
+
+# Execute npm start
+CMD npm start 

@@ -24,7 +24,8 @@ namespace Data.Repository {
             }).ToList();
         }
 
-        public async Task RemoverDispositivo(string chavePublicaId) {
+        public async Task RemoverDispositivo(string chavePublicaId) 
+        {
             var result = await _fido2Store.RemoveByPublicKeyId(Convert.FromBase64String(chavePublicaId));
             System.Console.WriteLine(result);
         }

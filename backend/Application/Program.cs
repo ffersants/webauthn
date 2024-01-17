@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddFido2Context<AppDbContext>();
 builder.Services.AddCors(p => p.AddPolicy("teste", p => p.AllowAnyMethod()
                                                          .AllowAnyHeader()
-                                                         .WithOrigins("http://localhost:3000")
+                                                         .WithOrigins("http://localhost:3000", "https://e5c4-189-84-136-194.ngrok-free.app")
                                                          .AllowCredentials()));
 //builder.Services.Configure<Fido2Configuration>(builder.Configuration.GetSection("fido2"));
 builder.Services.AddHttpContextAccessor();

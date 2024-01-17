@@ -59,16 +59,17 @@ namespace Application.Controllers
                 var authenticatorSelection = new AuthenticatorSelection
                 {
                     RequireResidentKey = false,
-                    UserVerification = UserVerificationRequirement.Preferred
+                    UserVerification = UserVerificationRequirement.Preferred,
                 };
 
                 var exts = new AuthenticationExtensionsClientInputs()
                 {
                     Extensions = true,
                     UserVerificationMethod = true,
+
                 };
 
-                var options = _fido2.RequestNewCredential(fidoUser, existingKeys.ToList(), authenticatorSelection, AttestationConveyancePreference.None, exts);
+                CredentialCreateOptions options = _fido2.RequestNewCredential(fidoUser, existingKeys.ToList(), authenticatorSelection, AttestationConveyancePreference.None, exts);
 
                 // 3. Temporarily store options, session/in-memory cache/redis/db 
                 var cookieOptions = new CookieOptions()
@@ -95,8 +96,8 @@ namespace Application.Controllers
             try
             {
                // 1. get the options we sent the client
-                if (string.IsNullOrEmpty(_httpContext?.HttpContext?.Request.Cookies["fido2.attestationOptions"]))
-                    return NotFound();
+                //if (string.IsNullOrEmpty(_httpContext?.HttpContext?.Request.Cookies["fido2.attestationOptions"]))
+                //    return NotFound();
 
                 var jsonOptions = _protector.Unprotect(_httpContext?.HttpContext?.Request.Cookies["fido2.attestationOptions"]);
                 CredentialCreateOptions options = CredentialCreateOptions.FromJson(jsonOptions);

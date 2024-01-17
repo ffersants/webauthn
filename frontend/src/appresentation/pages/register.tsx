@@ -31,7 +31,7 @@ const Register = () => {
 			);
 			const options = await resp.json();
 			const cookie = document.cookie;
-
+			
 			// Pass the options to the authenticator and wait for a response
 			const attResp = await startRegistration(options);
 			
