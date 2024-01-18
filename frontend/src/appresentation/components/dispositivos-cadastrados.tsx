@@ -7,7 +7,7 @@ import deleteDispositivoCadastrado from "../../services/dispositivos/delete-disp
 
 const DispositivosCadastrados = () => {
     const [dispositivos, setDispositivos] = useState<DispositivoCadastrado[]>([])
-
+    /*
     useEffect(() => {
         const getData = async() => {
             const result = await getDispositivosCadastrados(usuario.matricula)
@@ -15,7 +15,7 @@ const DispositivosCadastrados = () => {
         }
         getData()
     }, [])
-
+    */
     return (<div>
         {dispositivos.map(i => <>
             <div>

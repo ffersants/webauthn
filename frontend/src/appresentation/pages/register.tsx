@@ -3,10 +3,10 @@ import { startRegistration } from "@simplewebauthn/browser";
 import { useState } from "react";
 import usuario from "../../domain/constants";
 const Register = () => {
-    const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-	const baseUrl = process.env.REACT_APP_API_URL
-    
+	const [errorMessage, setErrorMessage] = useState("");
+	const [successMessage, setSuccessMessage] = useState("");
+	const baseUrl = process.env.REACT_APP_API_URL;
+
 	const handleRegistration = async () => {
 		// Reset success/error messages
 		setSuccessMessage("");
@@ -14,27 +14,24 @@ const Register = () => {
 
 		try {
 			// GET registration options from the endpoint that calls
-			const resp = await fetch(
-				baseUrl + "/register/get-options",
-				{
-					body: JSON.stringify({
-						username: usuario.matricula,
-						displayName: usuario.email,
-						attestationResponse: "string",
-					}),
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					credentials: "include"
-				}
-			);
+			const resp = await fetch(baseUrl + "/register/get-options", {
+				body: JSON.stringify({
+					username: usuario.matricula,
+					displayName: usuario.email,
+					attestationResponse: "string",
+				}),
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+			});
 			const options = await resp.json();
 			const cookie = document.cookie;
-			
+
 			// Pass the options to the authenticator and wait for a response
 			const attResp = await startRegistration(options);
-			
+
 			// POST the response to the endpoint that calls
 			const verificationResp = await fetch(
 				baseUrl + "/register/assert-options",
@@ -42,15 +39,21 @@ const Register = () => {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						"Cookie": cookie
+						Cookie: cookie,
 					},
 					body: JSON.stringify({
 						AuthenticatorAttestationRawResponse: attResp,
 						username: usuario.matricula,
 						displayName: usuario.email,
-						userAgent: navigator.userAgent
+						userAgent: navigator.userAgent,
+						deviceInfo: {
+							userAgent: navigator.userAgent,
+							platform: navigator.platform,
+							appName: navigator.appName,
+							appVersion: navigator.appVersion,
+						},
 					}),
-					credentials: "include"
+					credentials: "include",
 				}
 			);
 
@@ -88,6 +91,6 @@ const Register = () => {
 			<div id='error'>{errorMessage}</div>
 		</div>
 	);
-}
+};
 
-export default Register
+export default Register;
