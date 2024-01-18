@@ -16,5 +16,14 @@ namespace Application.DTOs.Input
         public string UserAgent {get; set;}
 
         public AuthenticatorAttestationRawResponse AuthenticatorAttestationRawResponse {get; set;}
+        
+        public DeviceInfo DeviceInfo {get; set;}
+    }
+
+    public class DeviceInfo {
+        public string UserAgent {get; set;}
+        public string Platform {get; set;}
+        public string AppName {get; set;}
+        public string AppVersion {get; set;}
     }
 }

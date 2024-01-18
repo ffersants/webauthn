@@ -1,6 +1,7 @@
 using Application.Service;
 using Data.Context;
 using Data.Repository;
+using Domain.Entities;
 using Domain.Interfaces.Services;
 using Domain.Repository;
 using Fido2NetLib;
@@ -15,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddFido2Context<AppDbContext>();
 builder.Services.AddCors(p => p.AddPolicy("teste", p => p.AllowAnyMethod()
                                                          .AllowAnyHeader()
-                                                         .WithOrigins("http://localhost:3000", "https://e5c4-189-84-136-194.ngrok-free.app")
+                                                         .WithOrigins("http://localhost:3000", "https://af02-177-75-11-130.ngrok-free.app")
                                                          .AllowCredentials()));
 //builder.Services.Configure<Fido2Configuration>(builder.Configuration.GetSection("fido2"));
 builder.Services.AddHttpContextAccessor();
@@ -30,6 +31,7 @@ builder.Services.AddFido2(builder.Configuration.GetSection("Fido2"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IDispositivosService, DispositivosService>();
 builder.Services.AddScoped<IDispositivoRepository, DispositivoRepository>();
+builder.Services.AddSingleton<AuthenticatorOptions>(new AuthenticatorOptions{});
 
 var app = builder.Build();
 

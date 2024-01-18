@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Domain.Interfaces.Services;
+using Domain.Entities;
 
 namespace Application.Controllers
 {
@@ -26,17 +27,20 @@ namespace Application.Controllers
         private readonly IHttpContextAccessor _httpContext;
         private readonly IDataProtector _protector;
         private readonly IEmailService _emailService;
+        private AuthenticatorOptions authenticatorOptions {get; set;}
         public RegisterController(IFido2 fido2, 
                                   IFido2Store fido2Store, 
                                   IHttpContextAccessor httpContext, 
                                   IDataProtectionProvider protector,
-                                  IEmailService emailService)
+                                  IEmailService emailService,
+                                  AuthenticatorOptions authenticatorOptions)
         {
             _fido2Store = fido2Store;
             _fido2 = fido2;
             _httpContext = httpContext;
             _protector = protector.CreateProtector("dsof");
             _emailService = emailService;
+            this.authenticatorOptions = authenticatorOptions;
         }
 
         [HttpPost("get-options")]
@@ -74,13 +78,15 @@ namespace Application.Controllers
                 // 3. Temporarily store options, session/in-memory cache/redis/db 
                 var cookieOptions = new CookieOptions()
                 {
-                    Path = "/",
                     Expires = DateTimeOffset.UtcNow.AddMinutes(2),
-                    HttpOnly = true,
                 };
+                /*
                 var content = _protector.Protect(options.ToJson());
                 _httpContext?.HttpContext?.Response.Cookies.Append("fido2.attestationOptions", content, cookieOptions);
-
+                */
+                
+                authenticatorOptions.Options = options;
+                
                 // 4. return options to client
                 return Ok(options);
             }
@@ -98,9 +104,11 @@ namespace Application.Controllers
                // 1. get the options we sent the client
                 //if (string.IsNullOrEmpty(_httpContext?.HttpContext?.Request.Cookies["fido2.attestationOptions"]))
                 //    return NotFound();
-
+                /*
                 var jsonOptions = _protector.Unprotect(_httpContext?.HttpContext?.Request.Cookies["fido2.attestationOptions"]);
                 CredentialCreateOptions options = CredentialCreateOptions.FromJson(jsonOptions);
+                */
+                var options = authenticatorOptions.Options;
 
                 // 2. Create callback so that lib can verify credential id is unique to this user
                 IsCredentialIdUniqueToUserAsyncDelegate callback = async (args, cancellationToken) =>
