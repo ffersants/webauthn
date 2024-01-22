@@ -26,6 +26,12 @@ const Register = () => {
 				},
 				credentials: "include",
 			});
+
+			if(resp.status !== 200) {
+				setErrorMessage(resp.body as any)
+				return
+			}
+
 			const options = await resp.json();
 			const cookie = document.cookie;
 
