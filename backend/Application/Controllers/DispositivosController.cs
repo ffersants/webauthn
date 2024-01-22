@@ -1,7 +1,6 @@
 using Fido2NetLib.Objects;
 using Fido2NetLib;
 using Microsoft.AspNetCore.Mvc;
-using NetDevPack.Fido2.EntityFramework.Store.Store;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Application.DTOs.Input;

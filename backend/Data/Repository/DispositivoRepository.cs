@@ -1,15 +1,15 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Domain.Entities;
+using Domain.Interfaces.Repository;
 using Domain.Repository;
-using NetDevPack.Fido2.EntityFramework.Store.Store;
 
 namespace Data.Repository {
     public class DispositivoRepository : IDispositivoRepository
     {
-        readonly IFido2Store _fido2Store;
+        readonly IFido2Repository _fido2Store;
 
-        public DispositivoRepository(IFido2Store fido2Store) {
+        public DispositivoRepository(IFido2Repository fido2Store) {
             _fido2Store = fido2Store;
         }
 

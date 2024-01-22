@@ -1,7 +1,6 @@
 ﻿using Fido2NetLib.Objects;
 using Fido2NetLib;
 using Microsoft.AspNetCore.Mvc;
-using NetDevPack.Fido2.EntityFramework.Store.Store;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Application.DTOs.Input;
@@ -15,6 +14,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Domain.Interfaces.Services;
 using Domain.Entities;
+using Domain.Interfaces.Repository;
 
 namespace Application.Controllers
 {
@@ -22,14 +22,14 @@ namespace Application.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
-        private readonly IFido2Store _fido2Store;
+        private readonly IFido2Repository _fido2Store;
         private readonly IFido2 _fido2;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IDataProtector _protector;
         private readonly IEmailService _emailService;
         private AuthenticatorOptions authenticatorOptions {get; set;}
         public RegisterController(IFido2 fido2, 
-                                  IFido2Store fido2Store, 
+                                  IFido2Repository fido2Store, 
                                   IHttpContextAccessor httpContext, 
                                   IDataProtectionProvider protector,
                                   IEmailService emailService,

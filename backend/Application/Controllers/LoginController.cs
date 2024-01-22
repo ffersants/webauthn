@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Application.DTOs.Input;
+using Domain.Interfaces.Repository;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using NetDevPack.Fido2.EntityFramework.Store.Store;
 
 namespace Application.Controllers
 {
@@ -14,12 +14,12 @@ namespace Application.Controllers
     public class LoginController : ControllerBase
     {
 
-        private readonly IFido2Store _fido2Store;
+        private readonly IFido2Repository _fido2Store;
         private readonly IFido2 _fido2;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IDataProtector _protector;
 
-        public LoginController(IFido2Store fido2Store,
+        public LoginController(IFido2Repository fido2Store,
                                IFido2 fido2,
                                IHttpContextAccessor httpContextAccessor,
                                IDataProtectionProvider protector)
