@@ -58,12 +58,17 @@ namespace Application.Controllers
                 // 1. Get user existing keys by username
                 var existingKeys = await _fido2Store.ListPublicKeysByUser(fidoUser.Name);
 
+                if(existingKeys.Count() != 0) {
+                    return Conflict("Usuário já possui um dispositivo cadastrado");
+                }
 
                 // 2. Create options
                 var authenticatorSelection = new AuthenticatorSelection
                 {
+                    //indica que o RP (aplicação) deseja um buil-in authenticator
+                    AuthenticatorAttachment = AuthenticatorAttachment.Platform,
                     RequireResidentKey = false,
-                    UserVerification = UserVerificationRequirement.Preferred,
+                    UserVerification = UserVerificationRequirement.Required,
                 };
 
                 var exts = new AuthenticationExtensionsClientInputs()
@@ -109,7 +114,7 @@ namespace Application.Controllers
                 CredentialCreateOptions options = CredentialCreateOptions.FromJson(jsonOptions);
                 */
                 var options = authenticatorOptions.Options;
-
+                var test = DateTime.Now;
                 // 2. Create callback so that lib can verify credential id is unique to this user
                 IsCredentialIdUniqueToUserAsyncDelegate callback = async (args, cancellationToken) =>
                 {
@@ -139,6 +144,7 @@ namespace Application.Controllers
                         CredType = success.Result.CredType,
                         SignatureCounter = success.Result.Counter,
                         RegDate = DateTime.Now,
+                        
                     });
 
                 _emailService.EnviarEmailRegistroDispositivo(DateTime.Now, model.Username);
