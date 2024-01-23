@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(p => p.AddPolicy("teste", p => p.AllowAnyMethod()
                                                          .AllowAnyHeader()
-                                                         .WithOrigins("http://localhost:3000", "https://3a32-189-84-136-194.ngrok-free.app")
+                                                         .WithOrigins("http://localhost:3000", "https://c204-177-75-11-130.ngrok-free.app")
                                                          .AllowCredentials()));
 //builder.Services.Configure<Fido2Configuration>(builder.Configuration.GetSection("fido2"));
 builder.Services.AddHttpContextAccessor();
@@ -33,6 +33,8 @@ builder.Services.AddScoped<IDispositivosService, DispositivosService>();
 builder.Services.AddScoped<IDispositivoRepository, DispositivoRepository>();
 builder.Services.AddSingleton<AuthenticatorOptions>(new AuthenticatorOptions{});
 builder.Services.AddScoped<IFido2Repository, Data.Repository.Fido2Repository>();
+builder.Services.AddSingleton(new Domain.Constants.AssertionOptions());
+
 var app = builder.Build();
 
 app.UseCors("teste");

@@ -18,11 +18,12 @@ namespace Application.Controllers
         private readonly IFido2 _fido2;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IDataProtector _protector;
-
+        public Domain.Constants.AssertionOptions _assertionOptions {get; set;}
         public LoginController(IFido2Repository fido2Store,
                                IFido2 fido2,
                                IHttpContextAccessor httpContextAccessor,
-                               IDataProtectionProvider protector)
+                               IDataProtectionProvider protector,
+                               Domain.Constants.AssertionOptions _assertionOptions)
         {
             _fido2Store = fido2Store;
             _fido2 = fido2;
@@ -58,7 +59,8 @@ namespace Application.Controllers
                     UserVerificationRequirement.Discouraged,
                     exts
                 );
-
+                _assertionOptions.Options = options;
+                /*
                 // 3. Temporarily store options, session/in-memory cache/redis/db
                 var cookieOptions = new CookieOptions()
                 {
@@ -68,7 +70,7 @@ namespace Application.Controllers
                 };
                 var content = _protector.Protect(options.ToJson());
                 _httpContext?.HttpContext?.Response.Cookies.Append("fido2.assertionOptions", content, cookieOptions);
-
+            */
                 // 5. Return options to client
                 return Ok(options);
             }
@@ -84,12 +86,14 @@ namespace Application.Controllers
         {
 
             // 1. Get the assertion options we sent the client
-            if (string.IsNullOrEmpty(_httpContext?.HttpContext?.Request.Cookies["fido2.assertionOptions"]))
+            /*if (string.IsNullOrEmpty(_httpContext?.HttpContext?.Request.Cookies["fido2.assertionOptions"]))
                 return NotFound();
 
             var jsonOptions = _protector.Unprotect(_httpContext?.HttpContext?.Request.Cookies["fido2.assertionOptions"]);
-            var options = AssertionOptions.FromJson(jsonOptions);
 
+            var options = AssertionOptions.FromJson(jsonOptions);
+            */
+            var options = _assertionOptions.Options;
             // 2. Get registered credential from database
             var creds = await _fido2Store.GetCredentialByPublicKeyIdAsync(login.AttestationResponse.Id);
             if (creds is null)
